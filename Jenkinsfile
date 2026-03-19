@@ -15,7 +15,7 @@ pipeline {
   stages {
     stage('CODE') {
       steps {
-        git url:"https://github.com/netlitrain/dockerimgpush.git", branch:"main"
+        git url:"https://github.com/netlitrain/kubetest.git", branch:"main"
       }
     }
 
