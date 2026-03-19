@@ -8,10 +8,8 @@ pipeline {
 
 
   environment {
-    IMAGE_NAME = "trainerbpl10/webimg"
+    IMAGE_NAME = "webimg"
     IMAGE_TAG = "${BUILD_NUMBER}"
-    CONTAINER_NAME = "webapp"
-    DOCKER_CREDS = credentials('dockerhub-creds')
   }
 
   stages {
@@ -33,18 +31,12 @@ pipeline {
       }
     }
 
-    stage('IMAGE_PUSH') {
-      steps {
-        sh " echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin "
-        sh " docker push $IMAGE_NAME:$IMAGE_TAG"
-      }
-    }
-
+    
     stage('DEPLOY') {
       steps {
         sh " aws eks --region us-east-1 update-kubeconfig --name netlicluster "
         sh " kubectl get pods "
-        sh " kubectl run netli --image=nginx "
+        sh " kubectl run netli --image=$IMAGE_NAME:$IMAGE_TAG "
       }
     }
   }
