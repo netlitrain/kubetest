@@ -31,25 +31,19 @@ pipeline {
       }
     }
 
-    stage('AWS Test') {
+    stage('AWS Deploy') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'awscreds'
                 ]]) {
                     sh '''
-                        aws s3 ls
+                        aws eks --region us-east-1 update-kubeconfig --name netlicluster
+                        kubectl get pods
+                        kubectl run netli --image=$IMAGE_NAME:$IMAGE_TAG
                     '''
                 }
             }
         }
-    
-    stage('DEPLOY') {
-      steps { 
-        sh " aws eks --region us-east-1 update-kubeconfig --name netlicluster "
-        sh " kubectl get pods "
-        sh " kubectl run netli --image=$IMAGE_NAME:$IMAGE_TAG "
-      }
-    }
   }
 }
