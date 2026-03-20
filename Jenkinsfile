@@ -8,8 +8,9 @@ pipeline {
 
 
   environment {
-    IMAGE_NAME = "webimg"
+    IMAGE_NAME = "trainerbpl10/kubeimg"
     IMAGE_TAG = "${BUILD_NUMBER}"
+    DOCKER_CREDS = credentials('dockerhub-creds')
   }
 
   stages {
@@ -31,18 +32,20 @@ pipeline {
       }
     }
 
+    stage('IMAGE_PUSH') {
+      steps {
+        sh " echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin "
+        sh " docker push $IMAGE_NAME:$IMAGE_TAG"
+      }
+    }
+    
     stage('AWS Deploy') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'awscreds'
-                ]]) {
-                    sh '''
-                        aws eks --region us-east-1 update-kubeconfig --name netlicluster
-                        kubectl get pods
-                        kubectl run netli --image=$IMAGE_NAME:$IMAGE_TAG
-                    '''
-                }
+                withAWS(credentials: 'aws-creds') {
+                sh 'aws eks --region us-east-1 update-kubeconfig --name netlicluster'
+                sh 'kubectl get pods'
+                sh 'kubectl run netlipod --image=$IMAGE_NAME:$IMAGE_TAG'
+                }   
             }
         }
   }
