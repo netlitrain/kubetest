@@ -8,7 +8,7 @@ pipeline {
 
 
   environment {
-        IMAGE_NAME = "trainerbpl10/kbimg"
+        IMAGE_NAME = "trainerbpl10/knbimage"
     	  IMAGE_TAG = "${BUILD_NUMBER}"
     	  DOCKER_CREDS = credentials('dockerhub-creds')
     }
