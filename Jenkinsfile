@@ -8,7 +8,6 @@ pipeline {
 
 
   environment {
-        SONAR_HOME = tool "Sonar"
         IMAGE_NAME = "trainerbpl10/kbimg"
     	  IMAGE_TAG = "${BUILD_NUMBER}"
     	  DOCKER_CREDS = credentials('dockerhub-creds')
@@ -21,14 +20,7 @@ pipeline {
       }
     }
 
-    stage("Sonarqube Analysis") {
-            steps {
-                withSonarQubeEnv("Sonar") {
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=NETLIPROJ -Dsonar.projectKey=NETLIPROJ"
-                }
-            }
-        }
-
+    
     stage('BUILD') {
       	    steps {
         	    sh " docker build -t $IMAGE_NAME:$IMAGE_TAG . "
